@@ -1,20 +1,34 @@
 package jp.techacademy.tomotaka.aruga.autoslideshowapp
 
+
 import android.content.ContentUris
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.provider.MediaStore
-import android.util.Log
-import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import jp.techacademy.tomotaka.aruga.autoslideshowapp.databinding.ActivityMainBinding
+import java.util.*
 
-class MainActivity : AppCompatActivity() ,View.OnClickListener{
+class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
     private val PERMISSIONS_REQUEST_CODE = 100
+
+    val imageUris = mutableListOf<Uri>()
+
+    var currentIndex = 0
+
+    private var isPlaying = false
+
+    private var handler = Handler(Looper.getMainLooper())
+
+    private var timer: Timer? = null
+
 
     // APIレベルによって許可が必要なパーミッションを切り替える
     private val readImagesPermission =
@@ -27,10 +41,6 @@ class MainActivity : AppCompatActivity() ,View.OnClickListener{
         val view = binding.root
         setContentView(view)
 
-        binding.button1.setOnClickListener(this)
-        binding.button2.setOnClickListener(this)
-        binding.button3.setOnClickListener(this)
-
         // パーミッションの許可状態を確認する
         if (checkSelfPermission(readImagesPermission) == PackageManager.PERMISSION_GRANTED) {
             // 許可されている
@@ -42,6 +52,68 @@ class MainActivity : AppCompatActivity() ,View.OnClickListener{
                 PERMISSIONS_REQUEST_CODE
             )
         }
+
+        binding.imageView.setImageURI(imageUris[0])
+
+        binding.susumubutton.setOnClickListener {
+// リストが空でないこと、または現在のインデックスがリストの最後の要素を指していないことを確認
+            if (imageUris.isNotEmpty()) {
+
+                if (currentIndex < imageUris.size - 1) {
+
+                    currentIndex++
+                } else {
+
+                    currentIndex = 0
+                }
+                binding.imageView.setImageURI(imageUris[currentIndex])
+            }
+        }
+
+        binding.modorubutton.setOnClickListener {
+// リストが空でないこと、または現在のインデックスがリストの最後の要素を指していないことを確認
+            if (imageUris.isNotEmpty()) {
+                if (currentIndex > 0) {
+
+                    currentIndex--
+                } else {
+                    currentIndex = imageUris.size - 1
+                }
+                binding.imageView.setImageURI(imageUris[currentIndex])
+
+            }
+        }
+
+        binding.saiseibutton.setOnClickListener {
+
+           if (!isPlaying){
+
+            timer = Timer()
+
+            timer!!.schedule(object : TimerTask() {
+                override fun run() {
+                    handler.post {
+                            if (imageUris.isNotEmpty()) {if (currentIndex < imageUris.size - 1) {
+
+                                currentIndex++
+                            } else {
+
+                                currentIndex = 0
+                            }
+                            binding.imageView.setImageURI(imageUris[currentIndex])
+                        }
+                    }
+
+                }
+            },0, 1000)
+
+        }else {
+               timer?.cancel()
+               }
+            isPlaying = !isPlaying
+        }
+
+
     }
 
     override fun onRequestPermissionsResult(
@@ -71,20 +143,22 @@ class MainActivity : AppCompatActivity() ,View.OnClickListener{
         )
 
         if (cursor!!.moveToFirst()) {
-            // indexからIDを取得し、そのIDから画像のURIを取得する
-            val fieldIndex = cursor.getColumnIndex(MediaStore.Images.Media._ID)
-            val id = cursor.getLong(fieldIndex)
-            val imageUri =
-                ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
+            do {
+                // indexからIDを取得し、そのIDから画像のURIを取得する
+                val fieldIndex = cursor.getColumnIndex(MediaStore.Images.Media._ID)
+                val id = cursor.getLong(fieldIndex)
+                val imageUri =
+                    ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
 
-            binding.imageView.setImageURI(imageUri)
+                imageUris.add(imageUri)
+
+                // Log.d("ANDROID", "URI : $imageUri")
+            } while (cursor.moveToNext())
         }
         cursor.close()
     }
-
-    override fun onClick(p0: View?) {
-        TODO("Not yet implemented")
-    }
-
-
 }
+
+
+
+

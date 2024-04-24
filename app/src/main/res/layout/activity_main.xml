@@ -2,27 +2,27 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="horizontal">
+    android:orientation="vertical">
 
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="wrap_content" />
 
     <Button
-        android:id="@+id/button1"
+        android:id="@+id/modorubutton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="戻る" />
 
     <Button
-        android:id="@+id/button2"
+        android:id="@+id/saiseibutton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="再生/停止" />
 
     <Button
-        android:id="@+id/button3"
+        android:id="@+id/susumubutton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="進む" />
