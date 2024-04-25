@@ -9,9 +9,12 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.provider.MediaStore
+import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import jp.techacademy.tomotaka.aruga.autoslideshowapp.databinding.ActivityMainBinding
 import java.util.*
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -52,8 +55,10 @@ class MainActivity : AppCompatActivity() {
                 PERMISSIONS_REQUEST_CODE
             )
         }
+        Log.d("aaa", imageUris.size.toString())
 
-        binding.imageView.setImageURI(imageUris[0])
+        setImages()
+
 
         binding.susumubutton.setOnClickListener {
 // リストが空でないこと、または現在のインデックスがリストの最後の要素を指していないことを確認
@@ -86,30 +91,31 @@ class MainActivity : AppCompatActivity() {
 
         binding.saiseibutton.setOnClickListener {
 
-           if (!isPlaying){
+            if (!isPlaying) {
 
-            timer = Timer()
+                timer = Timer()
 
-            timer!!.schedule(object : TimerTask() {
-                override fun run() {
-                    handler.post {
-                            if (imageUris.isNotEmpty()) {if (currentIndex < imageUris.size - 1) {
+                timer!!.schedule(object : TimerTask() {
+                    override fun run() {
+                        handler.post {
+                            if (imageUris.isNotEmpty()) {
+                                if (currentIndex < imageUris.size - 1) {
 
-                                currentIndex++
-                            } else {
+                                    currentIndex++
+                                } else {
 
-                                currentIndex = 0
+                                    currentIndex = 0
+                                }
+                                binding.imageView.setImageURI(imageUris[currentIndex])
                             }
-                            binding.imageView.setImageURI(imageUris[currentIndex])
                         }
+
                     }
+                }, 2000, 2000)
 
-                }
-            },0, 1000)
-
-        }else {
-               timer?.cancel()
-               }
+            } else {
+                timer?.cancel()
+            }
             isPlaying = !isPlaying
         }
 
@@ -126,6 +132,9 @@ class MainActivity : AppCompatActivity() {
             PERMISSIONS_REQUEST_CODE ->
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     getContentsInfo()
+                } else {
+                    Toast.makeText(this, "許可がないとアプリケーションを使用できません", Toast.LENGTH_LONG).show()
+                    // アプリケーションを終了
                 }
         }
     }
@@ -133,6 +142,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun getContentsInfo() {
         // 画像の情報を取得する
+
         val resolver = contentResolver
         val cursor = resolver.query(
             MediaStore.Images.Media.EXTERNAL_CONTENT_URI, // データの種類
@@ -141,21 +151,32 @@ class MainActivity : AppCompatActivity() {
             null, // フィルタ用パラメータ
             null // ソート (nullソートなし）
         )
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                do {
+                    // indexからIDを取得し、そのIDから画像のURIを取得する
+                    val fieldIndex = cursor.getColumnIndex(MediaStore.Images.Media._ID)
+                    val id = cursor.getLong(fieldIndex)
+                    val imageUri =
+                        ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
 
-        if (cursor!!.moveToFirst()) {
-            do {
-                // indexからIDを取得し、そのIDから画像のURIを取得する
-                val fieldIndex = cursor.getColumnIndex(MediaStore.Images.Media._ID)
-                val id = cursor.getLong(fieldIndex)
-                val imageUri =
-                    ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
+                    imageUris.add(imageUri)
 
-                imageUris.add(imageUri)
-
-                // Log.d("ANDROID", "URI : $imageUri")
-            } while (cursor.moveToNext())
+                    // Log.d("ANDROID", "URI : $imageUri")
+                } while (cursor.moveToNext())
+            }
+            setImages()
+            cursor.close()
+        } else {
+            Log.d("aaa", "エラーが出ました")
         }
-        cursor.close()
+    }
+
+    //画像を設定
+    private fun setImages() {
+        if (imageUris.isNotEmpty()) {
+            binding.imageView.setImageURI(imageUris[0])
+        }
     }
 }
 
