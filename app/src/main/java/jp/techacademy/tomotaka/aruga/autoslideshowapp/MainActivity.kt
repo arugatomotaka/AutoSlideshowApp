@@ -57,11 +57,12 @@ class MainActivity : AppCompatActivity() {
         }
         Log.d("aaa", imageUris.size.toString())
 
-        setImages()
+//        setImages()
 
 
         binding.susumubutton.setOnClickListener {
 // リストが空でないこと、または現在のインデックスがリストの最後の要素を指していないことを確認
+
             if (imageUris.isNotEmpty()) {
 
                 if (currentIndex < imageUris.size - 1) {
@@ -73,10 +74,12 @@ class MainActivity : AppCompatActivity() {
                 }
                 binding.imageView.setImageURI(imageUris[currentIndex])
             }
+
         }
 
         binding.modorubutton.setOnClickListener {
 // リストが空でないこと、または現在のインデックスがリストの最後の要素を指していないことを確認
+
             if (imageUris.isNotEmpty()) {
                 if (currentIndex > 0) {
 
@@ -87,7 +90,9 @@ class MainActivity : AppCompatActivity() {
                 binding.imageView.setImageURI(imageUris[currentIndex])
 
             }
+
         }
+
 
         binding.saiseibutton.setOnClickListener {
 
@@ -113,8 +118,17 @@ class MainActivity : AppCompatActivity() {
                     }
                 }, 2000, 2000)
 
+                binding.susumubutton.isEnabled = false
+                binding.modorubutton.isEnabled = false
+                binding.saiseibutton.setText("停止")
+
+
             } else {
                 timer?.cancel()
+                binding.susumubutton.isEnabled = true
+                binding.modorubutton.isEnabled = true
+                binding.saiseibutton.setText("再生")
+
             }
             isPlaying = !isPlaying
         }

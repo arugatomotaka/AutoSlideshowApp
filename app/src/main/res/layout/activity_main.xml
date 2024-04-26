@@ -7,7 +7,7 @@
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="600dp" />
 
     <Button
         android:id="@+id/modorubutton"
@@ -19,7 +19,7 @@
         android:id="@+id/saiseibutton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="再生/停止" />
+        android:text="@string/image_playback" />
 
     <Button
         android:id="@+id/susumubutton"

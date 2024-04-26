@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">AutoSlideshowApp</string>
+    <string name="image_playback">再生</string>
+    <string name="image_stop">停止</string>
 </resources>
