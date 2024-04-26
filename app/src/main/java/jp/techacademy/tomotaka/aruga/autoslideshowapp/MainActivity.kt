@@ -95,42 +95,43 @@ class MainActivity : AppCompatActivity() {
 
 
         binding.saiseibutton.setOnClickListener {
+            if (imageUris.isNotEmpty()) {
+                if (!isPlaying) {
 
-            if (!isPlaying) {
+                    timer = Timer()
 
-                timer = Timer()
+                    timer!!.schedule(object : TimerTask() {
+                        override fun run() {
+                            handler.post {
+                                if (imageUris.isNotEmpty()) {
+                                    if (currentIndex < imageUris.size - 1) {
 
-                timer!!.schedule(object : TimerTask() {
-                    override fun run() {
-                        handler.post {
-                            if (imageUris.isNotEmpty()) {
-                                if (currentIndex < imageUris.size - 1) {
+                                        currentIndex++
+                                    } else {
 
-                                    currentIndex++
-                                } else {
-
-                                    currentIndex = 0
+                                        currentIndex = 0
+                                    }
+                                    binding.imageView.setImageURI(imageUris[currentIndex])
                                 }
-                                binding.imageView.setImageURI(imageUris[currentIndex])
                             }
+
                         }
+                    }, 2000, 2000)
 
-                    }
-                }, 2000, 2000)
-
-                binding.susumubutton.isEnabled = false
-                binding.modorubutton.isEnabled = false
-                binding.saiseibutton.setText("停止")
+                    binding.susumubutton.isEnabled = false
+                    binding.modorubutton.isEnabled = false
+                    binding.saiseibutton.text = "停止"
 
 
-            } else {
-                timer?.cancel()
-                binding.susumubutton.isEnabled = true
-                binding.modorubutton.isEnabled = true
-                binding.saiseibutton.setText("再生")
+                } else {
+                    timer?.cancel()
+                    binding.susumubutton.isEnabled = true
+                    binding.modorubutton.isEnabled = true
+                    binding.saiseibutton.text = "再生"
 
+                }
+                isPlaying = !isPlaying
             }
-            isPlaying = !isPlaying
         }
 
 
