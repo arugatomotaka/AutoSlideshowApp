@@ -125,6 +125,7 @@ class MainActivity : AppCompatActivity() {
 
                 } else {
                     timer?.cancel()
+                    timer = null
                     binding.susumubutton.isEnabled = true
                     binding.modorubutton.isEnabled = true
                     binding.saiseibutton.text = "再生"
